@@ -13,7 +13,7 @@ export default () => {
 
 function parseRedisConfig() {
   const REDIS_REGEXP =
-    /redis:\/\/[a-zA-Z0-9]*:([a-zA-Z0-9]*)@([a-zA-Z0-9.]*):([0-9]*)/;
+    /redis:\/\/[a-zA-Z0-9]?:([a-zA-Z0-9]*)@([a-zA-Z0-9.-]*):([0-9]*)/;
   const redis_url = process.env.REDIS_URL;
   const redis_url_match = REDIS_REGEXP.exec(redis_url);
   const redis_password = redis_url_match[1];
