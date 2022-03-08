@@ -18,11 +18,6 @@ import { ViewEventDto } from './dto/view-event.dto';
 export class EventsController {
   constructor(private readonly eventsService: EventsService) {}
 
-  // @Post()
-  // create(@Body() createEventDto: CreateEventDto) {
-  //   return this.eventsService.create(createEventDto);
-  // }
-
   @ApiResponse({
     type: ViewEventDto,
     isArray: true,
@@ -48,6 +43,20 @@ export class EventsController {
   findByArea(@Param('area') area: string) {
     return this.eventsService.findByArea(area);
   }
+
+  @ApiOkResponse({
+    type: ViewEventDto,
+    isArray: true,
+  })
+  @Get('location/:location')
+  findByLocation(@Param('location') location: string) {
+    return this.eventsService.findByLocation(location);
+  }
+
+  // @Post()
+  // create(@Body() createEventDto: CreateEventDto) {
+  //   return this.eventsService.create(createEventDto);
+  // }
 
   // @Patch(':id')
   // update(@Param('id') id: string, @Body() updateEventDto: UpdateEventDto) {

@@ -20,7 +20,7 @@ export class EventsTasksService {
     //'https://datos.madrid.es/egob/catalogo/300107-0-agenda-actividades-eventos.json';
   }
 
-  // @Timeout(5000)
+  @Timeout(5000)
   @Cron(CronExpression.EVERY_DAY_AT_MIDNIGHT)
   handleCron() {
     this.logger.log('Init load events');

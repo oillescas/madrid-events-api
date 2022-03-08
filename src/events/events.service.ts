@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { MoreThan, Repository } from 'typeorm';
 import { ViewEventDto } from './dto/view-event.dto';
 // import { CreateEventDto } from './dto/create-event.dto';
 // import { UpdateEventDto } from './dto/update-event.dto';
@@ -18,7 +18,11 @@ export class EventsService {
   // }
 
   findAll(): Promise<ViewEventDto[]> {
-    return this.EventsRepository.find();
+    return this.EventsRepository.find({
+      where: {
+        endDate: MoreThan(new Date()),
+      },
+    });
   }
 
   findOne(id: number) {
@@ -27,7 +31,21 @@ export class EventsService {
 
   findByArea(area: string) {
     return this.EventsRepository.find({
-      where: { area },
+      where: {
+        area,
+        endDate: MoreThan(new Date()),
+      },
+    });
+  }
+
+  findByLocation(location: string) {
+    return this.EventsRepository.find({
+      where: {
+        location: {
+          id: location,
+        },
+        endDate: MoreThan(new Date()),
+      },
     });
   }
 
