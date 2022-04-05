@@ -9,6 +9,7 @@ import {
   Res,
   HttpStatus,
   Req,
+  Logger,
 } from '@nestjs/common';
 import { Request, Response } from 'express';
 import { EventsService } from './events.service';
@@ -20,6 +21,8 @@ import { EventsTasksService } from './events.tasks.service';
 @ApiTags('Events')
 @Controller('events')
 export class EventsController {
+  private readonly logger = new Logger(EventsController.name);
+
   constructor(
     private readonly eventsTaskService: EventsTasksService,
     private readonly eventsService: EventsService,
@@ -81,6 +84,7 @@ export class EventsController {
   remove(@Req() request: Request, @Res() res: Response) {
     const token = this.configService.get<string>('token');
     if (request?.headers?.authorization !== `T ${token}`) {
+      this.logger.error(`Failed to remove events reason: forbidden ${token}`);
       res.status(HttpStatus.FORBIDDEN).send();
     } else {
       this.eventsTaskService.deleteOldEvents();
