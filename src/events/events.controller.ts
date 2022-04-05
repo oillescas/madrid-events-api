@@ -6,17 +6,25 @@ import {
   Patch,
   Param,
   Delete,
+  Res,
+  HttpStatus,
+  Req,
 } from '@nestjs/common';
+import { Request, Response } from 'express';
 import { EventsService } from './events.service';
-import { CreateEventDto } from './dto/create-event.dto';
-import { UpdateEventDto } from './dto/update-event.dto';
 import { ApiOkResponse, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { ViewEventDto } from './dto/view-event.dto';
+import { ConfigService } from '@nestjs/config';
+import { EventsTasksService } from './events.tasks.service';
 
 @ApiTags('Events')
 @Controller('events')
 export class EventsController {
-  constructor(private readonly eventsService: EventsService) {}
+  constructor(
+    private readonly eventsTaskService: EventsTasksService,
+    private readonly eventsService: EventsService,
+    private configService: ConfigService,
+  ) {}
 
   @ApiResponse({
     type: ViewEventDto,
@@ -53,18 +61,30 @@ export class EventsController {
     return this.eventsService.findByLocation(location);
   }
 
-  // @Post()
-  // create(@Body() createEventDto: CreateEventDto) {
-  //   return this.eventsService.create(createEventDto);
-  // }
+  @Post()
+  create(@Req() request: Request, @Res() res: Response) {
+    const token = this.configService.get<string>('token');
+    if (request?.headers?.authorization !== `T ${token}`) {
+      res.status(HttpStatus.FORBIDDEN).send();
+    } else {
+      this.eventsTaskService.importEvents();
+      res.status(HttpStatus.CREATED).send();
+    }
+  }
 
   // @Patch(':id')
   // update(@Param('id') id: string, @Body() updateEventDto: UpdateEventDto) {
   //   return this.eventsService.update(+id, updateEventDto);
   // }
 
-  // @Delete(':id')
-  // remove(@Param('id') id: string) {
-  //   return this.eventsService.remove(+id);
-  // }
+  @Delete()
+  remove(@Req() request: Request, @Res() res: Response) {
+    const token = this.configService.get<string>('token');
+    if (request?.headers?.authorization !== `T ${token}`) {
+      res.status(HttpStatus.FORBIDDEN).send();
+    } else {
+      this.eventsTaskService.deleteOldEvents();
+      res.status(HttpStatus.CREATED).send();
+    }
+  }
 }

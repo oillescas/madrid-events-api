@@ -8,6 +8,7 @@ export default () => {
       port: redis_port,
       password: redis_password,
     },
+    token: process.env.TOKEN,
   };
 };
 

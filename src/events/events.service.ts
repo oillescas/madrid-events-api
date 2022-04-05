@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { MoreThan, Repository } from 'typeorm';
+import { LessThan, MoreThan, Repository } from 'typeorm';
 import { ViewEventDto } from './dto/view-event.dto';
 // import { CreateEventDto } from './dto/create-event.dto';
 // import { UpdateEventDto } from './dto/update-event.dto';
@@ -34,6 +34,14 @@ export class EventsService {
       where: {
         area,
         endDate: MoreThan(new Date()),
+      },
+    });
+  }
+
+  findOld() {
+    return this.EventsRepository.find({
+      where: {
+        endDate: LessThan(new Date()),
       },
     });
   }

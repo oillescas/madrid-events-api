@@ -13,6 +13,13 @@ export class EventsProcessor {
     @InjectRepository(Event) private eventsRepository: Repository<Event>,
   ) {}
 
+  @Process('old-event')
+  async processOldEvents(job: Job) {
+    this.logger.log(`Processing ${job.data.id} old event`);
+    const result = await this.eventsRepository.delete(job.data.id);
+    this.logger.log(`Deleted ${result.affected} old event`);
+  }
+
   @Process('new-events')
   async processNewEvents(job: Job) {
     this.logger.debug(
@@ -22,13 +29,11 @@ export class EventsProcessor {
       const event = await this.eventsRepository.findOne({
         where: { id: job.data.id },
       });
+      const parsedEvent = this.parseEvent(job.data);
       if (event) {
-        await this.eventsRepository.update(
-          job.data.id,
-          this.parseEvent(job.data),
-        );
+        await this.eventsRepository.update(job.data.id, parsedEvent);
       } else {
-        await this.eventsRepository.save(this.parseEvent(job.data));
+        await this.eventsRepository.save(parsedEvent);
       }
     } catch (error) {
       this.logger.error(
@@ -70,8 +75,8 @@ export class EventsProcessor {
       free: !!free,
       price,
       link,
-      area: address?.area['@id'].split('/').pop(),
-      district: address?.district['@id'].split('/').pop(),
+      area: address?.area?.['@id'].split('/').pop(),
+      district: address?.district?.['@id'].split('/').pop(),
       time,
       recurrence,
       type: type?.split('/').pop(),
